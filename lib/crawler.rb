@@ -3,6 +3,28 @@ require 'cgi'
 require 'json'
 require 'zipruby'
 
+def parse filename
+  Parse.new filename
+end
+
+class Parse
+  attr_reader :episode, :season, :show
+  def initialize filename
+    filename = File.basename filename
+
+    if m = /^(.*)\.S(\d\d)E(\d\d)/.match(filename)
+      @show = m[1].gsub '.', ' '
+      @season = remove_leading_zeros m[2]
+      @episode = remove_leading_zeros m[3]
+    end
+  end
+
+  def remove_leading_zeros text
+    text.gsub /^0*/, ''
+  end
+
+end
+
 class Itasa
   def initialize
     @agent = Mechanize.new do |a|
