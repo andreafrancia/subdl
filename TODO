@@ -1,9 +1,5 @@
 TODO:
  - mechanize interface to itasa
-    - login
     - Create search string given filename
-    - discover id for episode
-    - open subtitle page given an id
-    - download and unpack subtitle given subtitle page
- - read credentials from file
+
 

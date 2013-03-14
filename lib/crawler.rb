@@ -3,26 +3,57 @@ require 'cgi'
 require 'json'
 require 'zipruby'
 
-def parse filename
-  Parse.new filename
+class Crawler
+  def initialize itasa
+    @itasa = itasa
+  end
+
+  def download_sub_for path
+    movie_file = MovieFile.new(path)
+    @itasa.each_id movie_file.search_term do |id, showname|
+      @itasa.unpack_subtitle_to id, movie_file.srt_file
+    end
+  end
 end
 
-class Parse
+class MovieFile
   attr_reader :episode, :season, :show
   def initialize filename
-    filename = File.basename filename
+    @filename = filename
+    text = File.basename filename
+    remove_year_from text
 
-    if m = /^(.*)\.S(\d\d)E(\d\d)/.match(filename)
+    if m = /^(.*)\.S(\d\d)E(\d\d)/.match(text)
       @show = m[1].gsub '.', ' '
       @season = remove_leading_zeros m[2]
       @episode = remove_leading_zeros m[3]
     end
   end
 
+  def remove_year_from text
+    text.gsub! /\.20\d\d/, ''
+  end
+
   def remove_leading_zeros text
     text.gsub /^0*/, ''
   end
+  def search_term
+    "%s %dx%02d" % [show, season, episode]
+  end
+  def srt_file
+    WritableFile.new "#{@filename}.itasa.srt"
+  end
+end
 
+class WritableFile
+  def initialize path
+    @path = path
+  end
+  def save contents
+    File.open @path, 'w' do |f|
+      f.write contents
+    end
+  end
 end
 
 class Itasa
@@ -56,7 +87,7 @@ class Itasa
     nil
   end
 
-  def unpack_subtitle_to id, directory
+  def unpack_subtitle_to id, dest
     url = "http://#{host}/index.php?option=com_remository&Itemid=6&func=fileinfo&id=#{id}"
     page = @agent.get url
     download_link = page.search("//a[img[contains(@src,'download2.gif')]]").first
@@ -64,7 +95,7 @@ class Itasa
     zip_contents = zipped_subtitle.body
     Zip::Archive.open_buffer(zip_contents) do |archive|
       archive.each do |entry|
-        directory.save entry.name, entry.read
+        dest.save entry.read
       end
     end
   end
@@ -75,7 +106,7 @@ class Itasa
 end
 
 class Credentials
-  def self.read_to itasa
+  def read_to itasa
     contents = File.read(File.expand_path('~/.itasa-credentials')).lines
     username = contents.next.chomp
     password = contents.next.chomp

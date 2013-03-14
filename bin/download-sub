@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/crawler'
+
+itasa = Itasa.new
+Credentials.new.read_to itasa
+crawler = Crawler.new itasa
+
+until ARGV.empty? do
+  crawler.download_sub_for ARGV.shift
+end
