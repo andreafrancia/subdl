@@ -1,0 +1,15 @@
+Sub download
+============
+
+Download italian subtitle for your favorite show. Example:
+
+    $ download-sub ~/Downloads/The.Simpsons.S24E14.HDTV.x264-LOL.mp4
+
+The application needs to access to your Itasa account. You need to save your 
+credentials in the `~/.itasa-credentials` file using the following format:
+
+    $ cat ~/.itasa-credentials
+    username
+    password
+
+
