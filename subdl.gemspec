@@ -8,4 +8,5 @@ Gem::Specification.new do |s|
   s.email       = 'andrea@andreafrancia.it'
   s.files       = ["lib/crawler.rb"]
   s.homepage    = 'https://github.com/andreafrancia/subdl'
+  s.executables << 'subdl'
 end
