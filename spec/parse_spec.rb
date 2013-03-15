@@ -1,4 +1,4 @@
-require 'crawler.rb'
+require 'subdl'
 class String
   def episode() MovieFile.new(self).episode end
   def season()  MovieFile.new(self).season end

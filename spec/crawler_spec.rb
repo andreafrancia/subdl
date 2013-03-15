@@ -1,4 +1,4 @@
-require 'crawler'
+require 'subdl'
 
 describe Crawler do
   let(:crawler)      { Crawler.new logged_itasa }

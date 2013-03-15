@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require_relative '../lib/crawler'
+require_relative '../lib/subdl'
 
 itasa = Itasa.new
 Credentials.new.read_to itasa

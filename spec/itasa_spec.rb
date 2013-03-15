@@ -1,5 +1,5 @@
 require 'rspec-expectations'
-require 'crawler'
+require 'subdl'
 
 describe Itasa do
   let(:itasa) { Itasa.new }
