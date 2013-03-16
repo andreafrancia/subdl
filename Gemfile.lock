@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    subdl (0.0.1)
+    subdl (0.0.2.pre)
       mechanize
       zipruby
 

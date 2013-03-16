@@ -1,7 +1,7 @@
 require 'rspec-expectations'
 require 'subdl'
 
-describe Itasa do
+describe Itasa, :net => true do
   let(:itasa) { Itasa.new }
   let(:logged_itasa) { 
     itasa = Itasa.new 
