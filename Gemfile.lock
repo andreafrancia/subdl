@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     subdl (0.0.2.pre)
+      json
       mechanize
       zipruby
 
@@ -11,6 +12,7 @@ GEM
     diff-lcs (1.2.1)
     domain_name (0.5.8)
       unf (~> 0.0.3)
+    json (1.5.5)
     mechanize (2.5.1)
       domain_name (~> 0.5, >= 0.5.1)
       mime-types (~> 1.17, >= 1.17.2)
@@ -24,6 +26,7 @@ GEM
     net-http-persistent (2.8)
     nokogiri (1.5.6)
     ntlm-http (0.1.1)
+    rake (0.9.2.2)
     rspec (2.13.0)
       rspec-core (~> 2.13.0)
       rspec-expectations (~> 2.13.0)
@@ -42,5 +45,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  rake
   rspec
   subdl!

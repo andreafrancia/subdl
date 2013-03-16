@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.executables << 'subdl'
   s.add_runtime_dependency 'mechanize'
   s.add_runtime_dependency 'zipruby'
+  s.add_runtime_dependency 'json'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rake'
 end
