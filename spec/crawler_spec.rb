@@ -13,7 +13,7 @@ describe Crawler do
   it 'should unpack subtitle the rigth sub' do
     logged_itasa.stub(:each_id).with('The Show 1x03').
       and_yield('the-id', 'unused show name')
-    logged_itasa.should_receive(:unpack_subtitle_to).with('the-id', anything)
+    logged_itasa.should_receive(:download_zip).with('the-id')
 
     crawler.download_sub_for '/home/user/The.Show.S01E03.mp4'
   end

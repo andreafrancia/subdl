@@ -26,7 +26,5 @@ describe Itasa, :net => true do
                    ['40038', "The Simpsons 24x15 720p"],
                    ['40037', "The Simpsons 24x15 "]]
   end
-
-
 end
 
