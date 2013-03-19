@@ -14,9 +14,9 @@ describe MovieFile do
     end
 
     it 'should save the second file with a different filename' do
-      fs.should_receive(:save).with('ShowS04E03.itasa.srt', 'first file')
-      fs.should_receive(:save).with('ShowS04E03.itasa.1.srt', 'second file')
-      fs.should_receive(:save).with('ShowS04E03.itasa.2.srt', 'third file')
+      fs.should_receive(:save_file).with('ShowS04E03.itasa.srt', 'first file')
+      fs.should_receive(:save_file).with('ShowS04E03.itasa.1.srt', 'second file')
+      fs.should_receive(:save_file).with('ShowS04E03.itasa.2.srt', 'third file')
 
       movie = MovieFile.new 'ShowS04E03.mp4'
       movie.fs = fs

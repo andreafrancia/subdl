@@ -67,7 +67,7 @@ class MovieFile
       distinguisher = ".#{@subs_added}"
     else
       distinguisher = ''
-    end    
+    end
     @subs_added = @subs_added.to_i + 1
     return distinguisher
   end
@@ -86,26 +86,25 @@ class Itasa
     @agent = Mechanize.new do |a|
       a.user_agent_alias = 'Mac FireFox'
     end
-    @page = @agent.get "http://#{host}"
   end
 
   def login username, password
-    login_form = @page.form 'login'
+    home_page = @agent.get "http://#{host}"
+    login_form = home_page.form 'login'
     login_form.username = username
     login_form.passwd = password
     @page = @agent.submit(login_form)
   end
 
   def logged_in?
+    return false unless @page
     link_that_exists_only_once_logged = @page.search(
       "//a[@href='forum/index.php?action=unreadreplies']")
     link_that_exists_only_once_logged.first
   end
 
   def each_id text
-    url = URI.parse "http://#{host}/modules/mod_itasalivesearch/search.php"
-    url.query = "term=#{CGI.escape text}"
-    response = @agent.get url
+    response = @agent.get search_url(text)
     JSON.parse(response.body).each do |episode|
       yield episode['id'], episode['value']
     end
@@ -113,11 +112,25 @@ class Itasa
   end
 
   def download_zip id
-    url = "http://#{host}/index.php?option=com_remository&Itemid=6&func=fileinfo&id=#{id}"
-    page = @agent.get url
-    download_link = page.search("//a[img[contains(@src,'download2.gif')]]").first
-    zipped_subtitle = @agent.get download_link[:href]
+    page = @agent.get zip_url(id)
+    zipped_subtitle = @agent.get subtitle_zip_url(page)
     yield zipped_subtitle.body
+  end
+
+  def subtitle_zip_url page
+    link = page.search("//a[img[contains(@src,'download2.gif')]]").first
+    return link[:href]
+  end
+
+  def search_url text
+    url = URI.parse "http://#{host}/modules/mod_itasalivesearch/search.php"
+    url.query = "term=#{CGI.escape text}"
+    return url
+  end
+
+  def subtitle_page_url id
+    ("http://#{host}/index.php?option=com_remository&Itemid=6&func=fileinfo" +
+     "&id=#{id}")
   end
 
   def host
