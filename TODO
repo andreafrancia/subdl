@@ -1,5 +1,7 @@
 TODO:
- - mechanize interface to itasa
-    - Create search string given filename
-
-
+ - ask credentials to the user
+ - fallback to www.subs-title.net
+ - preserve original filename from zip
+ - does not download duplicates
+ - drag and drop
+ - support movies
