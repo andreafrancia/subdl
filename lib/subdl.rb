@@ -112,7 +112,7 @@ class Itasa
   end
 
   def download_zip id
-    page = @agent.get zip_url(id)
+    page = @agent.get subtitle_page_url(id)
     zipped_subtitle = @agent.get subtitle_zip_url(page)
     yield zipped_subtitle.body
   end
