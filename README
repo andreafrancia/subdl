@@ -1,11 +1,13 @@
-Sub download
-============
+subdl - The Subtitles Downloader
+================================
 
 [![Build Status](
   https://travis-ci.org/andreafrancia/subdl.png)](
   https://travis-ci.org/andreafrancia/subdl)
 
-Download italian subtitle for your favorite show. Example:
+Download the italian subtitle for your favorite show.
+
+Usage example:
 
     $ subdl ~/Downloads/The.Simpsons.S24E14.HDTV.x264-LOL.mp4
 
@@ -13,8 +15,9 @@ Installation:
 
     $ gem install subdl
 
-The application needs to access to your Itasa account. You need to save your 
-credentials in the `~/.itasa-credentials` file using the following format:
+The application needs to access to your www.italiansubs.net account. To make 
+available your credentials to `subdl` store them in the `~/.itasa-credentials` 
+file using the following format:
 
     $ cat ~/.itasa-credentials
     username
