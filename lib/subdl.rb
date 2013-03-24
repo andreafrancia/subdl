@@ -34,7 +34,7 @@ class MovieFile
   def initialize filename
     @filename = filename
     text = File.basename filename
-    remove_year_from text
+    text = remove_year_from text
 
     if m = /^(.*)\.S(\d\d)E(\d\d)/.match(text)
       @show = m[1].gsub '.', ' '
@@ -45,7 +45,7 @@ class MovieFile
   end
 
   def remove_year_from text
-    text.gsub! /\.20\d\d/, ''
+    text.gsub /\.20\d\d/, ''
   end
 
   def remove_leading_zeros text
