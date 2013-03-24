@@ -5,3 +5,4 @@ TODO:
  - does not download duplicates
  - drag and drop
  - support movies
+ - should issue a warning when the file does not exists
