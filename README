@@ -1,6 +1,10 @@
 Sub download
 ============
 
+[![Build Status](
+  https://travis-ci.org/andreafrancia/subdl.png)](
+  https://travis-ci.org/andreafrancia/subdl)
+
 Download italian subtitle for your favorite show. Example:
 
     $ subdl ~/Downloads/The.Simpsons.S24E14.HDTV.x264-LOL.mp4
