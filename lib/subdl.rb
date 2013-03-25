@@ -5,13 +5,15 @@ require 'zipruby'
 
 class Crawler
 
-  def initialize itasa
+  def initialize itasa, credentials
     @itasa = itasa
+    @credentials = credentials
   end
 
   def download_sub_for path
     movie_file = MovieFile.new(path)
-    @itasa.each_id movie_file.search_term do |id, showname|
+    @itasa.search(movie_file.search_term).each do |id|
+      @itasa.login *@credentials.read
       @itasa.download_zip id do |zip_contents|
         unpack_subtitle_to zip_contents, movie_file
       end
@@ -89,6 +91,7 @@ class Itasa
   end
 
   def login username, password
+    return if logged_in?
     home_page = @agent.get "http://#{host}"
     login_form = home_page.form 'login'
     login_form.username = username
@@ -103,12 +106,9 @@ class Itasa
     link_that_exists_only_once_logged.first
   end
 
-  def each_id text
+  def search text
     response = @agent.get search_url(text)
-    JSON.parse(response.body).each do |episode|
-      yield episode['id'], episode['value']
-    end
-    nil
+    JSON.parse(response.body).map { |episode| episode['id'] }
   end
 
   def download_zip id
@@ -139,10 +139,13 @@ class Itasa
 end
 
 class Credentials
-  def read_to itasa
-    contents = File.read(File.expand_path('~/.itasa-credentials')).lines
-    username = contents.next.chomp
-    password = contents.next.chomp
-    itasa.login username, password
+  def parse file_contents
+    lines = file_contents.lines
+    username = lines.next.chomp
+    password = lines.next.chomp
+    [username, password]
+  end
+  def read
+    parse File.read(File.expand_path('~/.itasa-credentials'))
   end
 end

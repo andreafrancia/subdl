@@ -2,9 +2,7 @@
 
 require 'subdl'
 
-itasa = Itasa.new
-Credentials.new.read_to itasa
-crawler = Crawler.new itasa
+crawler = Crawler.new Itasa.new, Credentials.new
 
 until ARGV.empty? do
   crawler.download_sub_for ARGV.shift
