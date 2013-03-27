@@ -1,11 +1,16 @@
 require 'mechanize'
 
 class PodnapisiClient
-  def search text
+  def search text, season, episode
     agent = Mechanize.new
     agent.get 'http://www.sub-titles.net/' do |page|
         form = page.form_with( :name => 'sf3') do |search|
           search.sK = text
+          search.sTS = season
+          search.sTE = episode
+          form.field_with(name:'sJ').value=2
+          # 2 -> Inglese
+          # 9 -> Italiano
         end
         return form.submit.body
     end
