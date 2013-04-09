@@ -2,7 +2,7 @@ require 'rspec-expectations'
 require 'subdl'
 
 describe Itasa do
-  let(:itasa) { Itasa.new }
+  let(:itasa) { Itasa.new mechanize_agent}
 
   it 'should login' do
     itasa.should_not be_logged_in

@@ -3,6 +3,17 @@ require 'cgi'
 require 'json'
 require 'zipruby'
 
+class Subdl
+  def initialize agent
+    @crawler = Crawler.new Itasa.new(agent), Credentials.new
+  end
+  def main argv
+    until argv.empty? do
+      @crawler.download_sub_for argv.shift
+    end
+  end
+end
+
 class Crawler
 
   def initialize itasa, credentials
@@ -83,11 +94,15 @@ class FileSystem
   end
 end
 
+def mechanize_agent
+  Mechanize.new do |a|
+    a.user_agent_alias = 'Mac FireFox'
+  end
+end
+
 class Itasa
-  def initialize
-    @agent = Mechanize.new do |a|
-      a.user_agent_alias = 'Mac FireFox'
-    end
+  def initialize agent
+    @agent = agent
   end
 
   def login username, password
@@ -103,7 +118,7 @@ class Itasa
     return false unless @page
     link_that_exists_only_once_logged = @page.search(
       "//a[@href='forum/index.php?action=unreadreplies']")
-    link_that_exists_only_once_logged.first
+    return link_that_exists_only_once_logged.first != nil
   end
 
   def search text

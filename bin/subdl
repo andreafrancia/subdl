@@ -1,9 +1,5 @@
 #!/usr/bin/env ruby
-
 require 'subdl'
 
-crawler = Crawler.new Itasa.new, Credentials.new
-
-until ARGV.empty? do
-  crawler.download_sub_for ARGV.shift
-end
+subdl = Subdl.new mechanize_agent
+subdl.main ARGV

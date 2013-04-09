@@ -13,5 +13,6 @@ describe Crawler do
 
     crawler.download_sub_for '/home/user/The.Show.S01E03.mp4'
   end
+
 end
 
