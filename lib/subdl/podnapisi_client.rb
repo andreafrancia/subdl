@@ -33,10 +33,20 @@ class PodnapisiClient
     def initialize cell
       @cell = cell
     end
-    def title()    @cell.css('a[2]').text                    end
-    def href()     @cell.css('a[2]').attribute('href').value end
-    def filename() @cell.css('span.opis[1]').text            end
-    def season()   @cell.css('span.opis[2] b[1]').text       end
-    def episode()  @cell.css('span.opis[2] b[2]').text       end
+    def title
+      @cell.xpath('.//a[position()=2]').text
+    end
+    def href
+      @cell.xpath('.//a[position()=2]/@href').text
+    end
+    def filename
+      @cell.xpath(".//span[@class='opis'][1]").text
+    end
+    def season()
+      @cell.xpath(".//span[@class='opis'][2]/b[1]").text
+    end
+    def episode()
+      @cell.xpath(".//span[@class='opis'][2]/b[2]").text
+    end
   end
 end

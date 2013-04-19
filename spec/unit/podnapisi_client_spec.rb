@@ -1,5 +1,4 @@
 require 'subdl/podnapisi_client'
-require 'pry'
 
 describe PodnapisiClient do
   let(:client) { PodnapisiClient.new }
