@@ -1,6 +1,6 @@
 TODO:
- - ask credentials to the user
  - fallback to www.subs-title.net
+ - ask credentials to the user
  - preserve original filename from zip
  - does not download duplicates
  - drag and drop
