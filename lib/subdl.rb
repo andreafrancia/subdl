@@ -139,7 +139,7 @@ class Itasa
   def search_url text
     url = URI.parse "http://#{host}/modules/mod_itasalivesearch/search.php"
     url.query = "term=#{CGI.escape text}"
-    return url
+    return url.to_s
   end
 
   def subtitle_page_url id

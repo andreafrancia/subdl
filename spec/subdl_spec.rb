@@ -3,6 +3,7 @@ describe Subdl do
     agent = double 'agent'
     subdl = Subdl.new agent
   end
+
   # User stories:
   #  - tell which page it is reading
   #  - download subtitles from Itasa

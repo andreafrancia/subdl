@@ -6,3 +6,5 @@ TODO:
  - drag and drop
  - support movies
  - should issue a warning when the file does not exists
+ - when a folder is specified
+ - tell from which page the subtitle has been downloaded
