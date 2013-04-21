@@ -22,7 +22,7 @@ class Crawler
   end
 
   def download_sub_for path
-    movie_file = MovieFile.new(path)
+    movie_file = MovieFile.new path
     @itasa.search(movie_file.search_term).each do |id|
       @itasa.login *@credentials.read
       @itasa.download_zip id do |zip_contents|
@@ -34,7 +34,7 @@ class Crawler
   def unpack_subtitle_to zip_contents, movie_file
     Zip::Archive.open_buffer(zip_contents) do |archive|
       archive.each do |entry|
-        movie_file.add_subtitle entry.read
+        movie_file.save_subtitle entry.read, FileSystem.new
       end
     end
   end
@@ -43,7 +43,7 @@ end
 
 class MovieFile
   attr_reader :episode, :season, :show
-  attr_writer :fs
+
   def initialize filename
     @filename = filename
     text = File.basename filename
@@ -54,7 +54,6 @@ class MovieFile
       @season = remove_leading_zeros m[2]
       @episode = remove_leading_zeros m[3]
     end
-    @fs = FileSystem
   end
 
   def remove_year_from text
@@ -69,10 +68,10 @@ class MovieFile
     "%s %dx%02d" % [show, season, episode]
   end
 
-  def add_subtitle contents
+  def save_subtitle contents, fs
     srt_filename = @filename.gsub /.mp4$/, ''
     srt_filename += ".itasa#{next_distinguisher}.srt"
-    @fs.save_file srt_filename, contents
+    fs.save_file srt_filename, contents
   end
 
   def next_distinguisher
@@ -87,7 +86,7 @@ class MovieFile
 end
 
 class FileSystem
-  def self.save_file filename, contents
+  def save_file filename, contents
     File.open filename, 'w' do |f|
       f.write contents
     end

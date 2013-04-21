@@ -8,9 +8,8 @@ describe MovieFile do
       fs.should_receive(:save_file).with('ShowS04E03.itasa.srt', 'contents')
 
       movie = MovieFile.new 'ShowS04E03.mp4'
-      movie.fs = fs
 
-      movie.add_subtitle 'contents'
+      movie.save_subtitle 'contents', fs
     end
 
     it 'should save the second file with a different filename' do
@@ -19,11 +18,10 @@ describe MovieFile do
       fs.should_receive(:save_file).with('ShowS04E03.itasa.2.srt', 'third file')
 
       movie = MovieFile.new 'ShowS04E03.mp4'
-      movie.fs = fs
 
-      movie.add_subtitle 'first file'
-      movie.add_subtitle 'second file'
-      movie.add_subtitle 'third file'
+      movie.save_subtitle 'first file', fs
+      movie.save_subtitle 'second file', fs
+      movie.save_subtitle 'third file', fs
     end
   end
   context 'filename parsing' do
