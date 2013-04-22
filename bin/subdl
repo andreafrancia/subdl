@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 require 'subdl'
 
-subdl = Subdl.new mechanize_agent
+subdl = Subdl.new mechanize_agent, ItasaLoginForm.new
 subdl.main ARGV

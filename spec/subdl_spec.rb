@@ -1,8 +1,30 @@
 describe Subdl do
   it 'should downlaod subtitles' do
     agent = double 'agent'
-    subdl = Subdl.new agent
+    itasa_login = double 'itasa_login'
+    stdout = StringIO.new
+
+    subdl = Subdl.new agent, itasa_login, stdout
+
+    agent.should_receive(:get).with(
+      "http://www.italiansubs.net/modules/mod_itasalivesearch/" +
+      "search.php?term=Show+1x02").and_return(
+        a_page '[{"value":"Title","id":"123"}]')
+    itasa_login.stub(:login)
+    agent.should_receive(:get).with(
+      'http://www.italiansubs.net/index.php?option=com_remository' +
+      '&Itemid=6&func=fileinfo&id=123').and_return(
+        a_page('<a href="zip_location"><img src=".../download2.gif"></a>'))
+    agent.should_receive(:get).with('zip_location').
+      and_return(a_page '')
+
+    subdl.main ["Show.S01E02.avi"]
   end
+
+  def a_page content
+    Struct.new(:body).new(content)
+  end
+
 
   # User stories:
   #  - tell which page it is reading

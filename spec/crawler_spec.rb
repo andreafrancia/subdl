@@ -7,7 +7,7 @@ describe Crawler do
 
   it 'should search and download subtitles' do
     credentials.stub(read:["pippo", "secret"])
-    itasa.stub(:search).with('The Show 1x03').and_return(['the-id'])
+    itasa.stub(:search_subtitles).with('The Show 1x03').and_return(['the-id'])
     itasa.should_receive(:login).with('pippo', 'secret')
     itasa.should_receive(:download_zip).with('the-id')
 

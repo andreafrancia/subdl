@@ -2,10 +2,12 @@ require 'mechanize'
 require 'cgi'
 require 'json'
 require 'zipruby'
+require 'nokogiri'
 
 class Subdl
-  def initialize agent
-    @crawler = Crawler.new Itasa.new(agent), Credentials.new
+  def initialize agent, itasa_login, stdout=$stdout
+    itasa = Itasa.new(agent, itasa_login)
+    @crawler = Crawler.new itasa, Credentials.new
   end
   def main argv
     until argv.empty? do
@@ -23,7 +25,9 @@ class Crawler
 
   def download_sub_for path
     movie_file = MovieFile.new path
-    @itasa.search(movie_file.search_term).each do |id|
+    ids = @itasa.search_subtitles(movie_file.search_term)
+
+    ids.each do |id|
       @itasa.login *@credentials.read
       @itasa.download_zip id do |zip_contents|
         unpack_subtitle_to zip_contents, movie_file
@@ -99,19 +103,18 @@ def mechanize_agent
   end
 end
 
-class Itasa
-  def initialize agent
-    @agent = agent
-  end
+class ItasaLoginForm
 
-  def login username, password
+  def login username, password, page_where_to_login, agent
     return if logged_in?
-    home_page = @agent.get "http://#{host}"
+    home_page = agent.get page_where_to_login
     login_form = home_page.form 'login'
     login_form.username = username
     login_form.passwd = password
-    @page = @agent.submit(login_form)
+    @page = agent.submit(login_form)
   end
+
+  private
 
   def logged_in?
     return false unless @page
@@ -120,20 +123,42 @@ class Itasa
     return link_that_exists_only_once_logged.first != nil
   end
 
-  def search text
+
+end
+
+class Itasa
+  def initialize agent, login_form
+    @agent = agent
+    @login_form = login_form || ItasaLoginForm.new
+  end
+
+  def login username, password
+    @login_form.login username, password, "http://#{host}", @agent
+  end
+
+  def autocomplete_data_for text
     response = @agent.get search_url(text)
-    JSON.parse(response.body).map { |episode| episode['id'] }
+    response.body
+  end
+
+  def search_subtitles text
+    json = autocomplete_data_for text
+    return extract_ids_from_autocomplete_data json
+  end
+
+  def extract_ids_from_autocomplete_data json
+    JSON.parse(json).map { |episode| episode['id'] }
   end
 
   def download_zip id
     page = @agent.get subtitle_page_url(id)
-    zipped_subtitle = @agent.get subtitle_zip_url(page)
+    zipped_subtitle = @agent.get subtitle_zip_url(page.body)
     yield zipped_subtitle.body
   end
 
   def subtitle_zip_url page
-    link = page.search("//a[img[contains(@src,'download2.gif')]]").first
-    return link[:href]
+    doc = Nokogiri::HTML(page)
+    return doc.at_xpath("//a[img[contains(@src,'download2.gif')]]")[:href]
   end
 
   def search_url text

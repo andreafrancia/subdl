@@ -4,7 +4,8 @@ require 'subdl'
 describe Itasa do
 
   let(:agent) { double 'itasa' }
-  let(:itasa) { Itasa.new agent }
+  let(:login_form) { double 'login_form' }
+  let(:itasa) { Itasa.new agent, login_form }
 
   it 'should discover ids' do
 
@@ -14,7 +15,7 @@ describe Itasa do
 [{"value":"The Simpsons 24x15 WEB-DL","id":"40039"},{"value":"The Simpsons 24x15 720p","id":"40038"},{"value":"The Simpsons 24x15 ","id":"40037"}]
 EOF
 
-    found_ids = itasa.search 'The Simpsons 24x15'
+    found_ids = itasa.search_subtitles 'The Simpsons 24x15'
     found_ids.should == ['40039', '40038', '40037']
   end
 end
