@@ -5,9 +5,11 @@ require 'zipruby'
 require 'nokogiri'
 
 class Subdl
-  def initialize agent, itasa_login, stdout, file_system
+  def initialize agent, itasa_login, stdout, file_system,
+                 file_reader
     itasa = Itasa.new(agent, itasa_login)
-    @crawler = Crawler.new itasa, Credentials.new, file_system, stdout
+    credentials = Credentials.new file_reader
+    @crawler = Crawler.new itasa, credentials, file_system, stdout
   end
   def main argv
     until argv.empty? do
@@ -182,6 +184,9 @@ class Itasa
 end
 
 class Credentials
+  def initialize file_reader
+    @file_reader = file_reader
+  end
   def parse file_contents
     lines = file_contents.lines.to_a
     username = lines[0].chomp
@@ -189,6 +194,12 @@ class Credentials
     [username, password]
   end
   def read
-    parse File.read(File.expand_path('~/.itasa-credentials'))
+    parse @file_reader.read_expand('~/.itasa-credentials')
+  end
+end
+
+class FileReader
+  def read_expand expandable_path
+    File.read(File.expand_path(expandable_path))
   end
 end

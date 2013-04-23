@@ -4,8 +4,9 @@ describe Subdl do
     itasa_login = double 'itasa_login'
     stdout      = StringIO.new
     file_system = double 'file_system'
+    file_reader = double 'file_reader'
 
-    subdl = Subdl.new agent, itasa_login, stdout, file_system
+    subdl = Subdl.new agent, itasa_login, stdout, file_system, file_reader
 
     agent.should_receive(:get).with(
       "http://www.italiansubs.net/modules/mod_itasalivesearch/" +
@@ -20,6 +21,8 @@ describe Subdl do
       and_return(a_page a_zip)
     file_system.should_receive(:save_file).with("Show.S01E02.avi.itasa.srt",
                                                 "contents")
+    file_reader.should_receive(:read_expand).with("~/.itasa-credentials").
+      and_return("username\npassword")
 
     subdl.main ["Show.S01E02.avi"]
 

@@ -4,6 +4,7 @@ require 'subdl'
 subdl = Subdl.new mechanize_agent, 
                   ItasaLoginForm.new, 
                   $stdout,
-                  FileSystem.new
+                  FileSystem.new,
+                  FileReader.new
 
 subdl.main ARGV
