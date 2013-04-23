@@ -183,7 +183,7 @@ end
 
 class Credentials
   def parse file_contents
-    lines = file_contents.lines
+    lines = file_contents.lines.to_a
     username = lines[0].chomp
     password = lines[1].chomp
     [username, password]
