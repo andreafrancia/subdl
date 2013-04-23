@@ -1,4 +1,5 @@
 TODO:
+ - tell if no subtitles has been found on italiansubs.net
  - fallback to www.subs-title.net
  - ask credentials to the user
  - preserve original filename from zip

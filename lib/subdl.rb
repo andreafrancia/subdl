@@ -5,9 +5,9 @@ require 'zipruby'
 require 'nokogiri'
 
 class Subdl
-  def initialize agent, itasa_login, stdout=$stdout
+  def initialize agent, itasa_login, stdout, file_system
     itasa = Itasa.new(agent, itasa_login)
-    @crawler = Crawler.new itasa, Credentials.new
+    @crawler = Crawler.new itasa, Credentials.new, file_system, stdout
   end
   def main argv
     until argv.empty? do
@@ -18,13 +18,15 @@ end
 
 class Crawler
 
-  def initialize itasa, credentials
+  def initialize itasa, credentials, file_system, stdout
     @itasa = itasa
     @credentials = credentials
+    @file_system = file_system
+    @stdout = stdout
   end
 
   def download_sub_for path
-    movie_file = MovieFile.new path
+    movie_file = MovieFile.new path, @stdout
     ids = @itasa.search_subtitles(movie_file.search_term)
 
     ids.each do |id|
@@ -38,7 +40,7 @@ class Crawler
   def unpack_subtitle_to zip_contents, movie_file
     Zip::Archive.open_buffer(zip_contents) do |archive|
       archive.each do |entry|
-        movie_file.save_subtitle entry.read, FileSystem.new
+        movie_file.save_subtitle entry.read, @file_system
       end
     end
   end
@@ -48,7 +50,7 @@ end
 class MovieFile
   attr_reader :episode, :season, :show
 
-  def initialize filename
+  def initialize filename, stdout=nil
     @filename = filename
     text = File.basename filename
     text = remove_year_from text
@@ -58,6 +60,7 @@ class MovieFile
       @season = remove_leading_zeros m[2]
       @episode = remove_leading_zeros m[3]
     end
+    @stdout = stdout
   end
 
   def remove_year_from text
@@ -75,6 +78,7 @@ class MovieFile
   def save_subtitle contents, fs
     srt_filename = @filename.gsub /.mp4$/, ''
     srt_filename += ".itasa#{next_distinguisher}.srt"
+    @stdout.puts "Downloaded as #{srt_filename}"
     fs.save_file srt_filename, contents
   end
 
