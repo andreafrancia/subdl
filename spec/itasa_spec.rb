@@ -18,5 +18,6 @@ EOF
     found_ids = itasa.search_subtitles 'The Simpsons 24x15'
     found_ids.should == ['40039', '40038', '40037']
   end
+
 end
 

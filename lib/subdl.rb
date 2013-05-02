@@ -31,6 +31,10 @@ class Crawler
     movie_file = MovieFile.new path, @stdout
     ids = @itasa.search_subtitles(movie_file.search_term)
 
+    if not ids.any? 
+      @stdout.puts "No subtitles found on Itasa for: #{path}"
+    end
+
     ids.each do |id|
       @itasa.login *@credentials.read
       @itasa.download_zip id do |zip_contents|
@@ -142,18 +146,9 @@ class Itasa
     @login_form.login username, password, "http://#{host}", @agent
   end
 
-  def autocomplete_data_for text
-    response = @agent.get search_url(text)
-    response.body
-  end
-
   def search_subtitles text
     json = autocomplete_data_for text
     return extract_ids_from_autocomplete_data json
-  end
-
-  def extract_ids_from_autocomplete_data json
-    JSON.parse(json).map { |episode| episode['id'] }
   end
 
   def download_zip id
@@ -176,6 +171,18 @@ class Itasa
   def subtitle_page_url id
     ("http://#{host}/index.php?option=com_remository&Itemid=6&func=fileinfo" +
      "&id=#{id}")
+  end
+
+  private 
+
+  def autocomplete_data_for text
+    response = @agent.get search_url(text)
+    response.body
+  end
+
+  def extract_ids_from_autocomplete_data json
+    return [] if json == 'null' 
+    JSON.parse(json).map { |episode| episode['id'] }
   end
 
   def host
