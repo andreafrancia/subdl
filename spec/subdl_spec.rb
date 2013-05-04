@@ -9,10 +9,10 @@ describe 'Subtile download' do
   let(:file_reader) { double 'file_reader' }
 
   specify 'download from italian-subs.net' do
-  
+
     given_GET_response(
       'http://www.italiansubs.net/modules/mod_itasalivesearch/search.php?' +
-      'term=Show+1x02', 
+      'term=Show+1x02',
       '[{"value":"Title","id":"123"}]')
     itasa_login.stub(:login)
     given_GET_response(
@@ -33,17 +33,6 @@ describe 'Subtile download' do
 
   def given_GET_response url, response_body
     agent.should_receive(:get).with(url).and_return(a_page(response_body))
-  end
-  
-  specify 'when is not found on italiansubs.net' do
-    given_GET_response(
-      'http://www.italiansubs.net/modules/mod_itasalivesearch/search.php?term=Show+1x02', 
-      'null')
-
-    subdl.main ["Show.S01E02.avi"]
-
-    stdout.string.lines.map(&:chomp).should include(
-      "No subtitles found on Itasa for: Show.S01E02.avi")
   end
 
   def a_page content

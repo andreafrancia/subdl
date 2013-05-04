@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    subdl (0.0.7)
+    subdl (0.0.8)
       json
       mechanize
       zipruby
@@ -13,7 +13,7 @@ GEM
     diff-lcs (1.2.1)
     domain_name (0.5.8)
       unf (~> 0.0.3)
-    json (1.5.5)
+    json (1.7.7)
     mechanize (2.5.1)
       domain_name (~> 0.5, >= 0.5.1)
       mime-types (~> 1.17, >= 1.17.2)
