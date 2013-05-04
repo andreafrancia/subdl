@@ -4,8 +4,7 @@ require 'subdl'
 describe Itasa do
 
   let(:agent) { double 'itasa' }
-  let(:login_form) { double 'login_form' }
-  let(:itasa) { Itasa.new agent, login_form }
+  let(:itasa) { Itasa.new agent }
 
   it 'should discover ids' do
 

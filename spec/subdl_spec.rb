@@ -1,28 +1,34 @@
 describe 'Subtile download' do
   subject { subdl }
-  let(:subdl) { Subdl.new agent, itasa_login, stdout, file_system, file_reader }
+  let(:subdl) { Subdl.new agent, stdout, file_system }
 
   let(:agent)       { double 'agent' }
-  let(:itasa_login) { double 'itasa_login' }
   let(:stdout)      { StringIO.new }
   let(:file_system) { double 'file_system' }
-  let(:file_reader) { double 'file_reader' }
 
   specify 'download from italian-subs.net' do
 
     given_GET_response(
       'http://www.italiansubs.net/modules/mod_itasalivesearch/search.php?' +
       'term=Show+1x02',
-      '[{"value":"Title","id":"123"}]')
-    itasa_login.stub(:login)
+      '[{"value":"Title","id":"111"},{"value":"Title","id":"222"}]')
+    agent.should_receive(:login).with('username','password')
+    agent.should_receive(:login).with('username','password')
     given_GET_response(
       'http://www.italiansubs.net/index.php?option=com_remository&Itemid=6'+
-      '&func=fileinfo&id=123',
-      '<a href="zip_location"><img src=".../download2.gif"></a>')
-    given_GET_response('zip_location', a_zip)
+      '&func=fileinfo&id=111',
+      '<a href="zip_location1"><img src=".../download2.gif"></a>')
+    given_GET_response(
+      'http://www.italiansubs.net/index.php?option=com_remository&Itemid=6'+
+      '&func=fileinfo&id=222',
+      '<a href="zip_location2"><img src=".../download2.gif"></a>')
+    given_GET_response('zip_location1', a_zip)
+    given_GET_response('zip_location2', a_zip)
     file_system.should_receive(:save_file).with(
       "Show.S01E02.avi.itasa.srt", "contents")
-    file_reader.should_receive(:read_expand).with(
+    file_system.should_receive(:save_file).with(
+      "Show.S01E02.avi.itasa.1.srt", "contents")
+    file_system.should_receive(:read_expand).with(
       "~/.itasa-credentials").and_return("username\npassword")
 
     subdl.main ["Show.S01E02.avi"]

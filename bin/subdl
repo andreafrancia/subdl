@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby
 require 'subdl'
 
-subdl = Subdl.new mechanize_agent, 
-                  ItasaLoginForm.new, 
+subdl = Subdl.new ItasaAgent.new,
                   $stdout,
-                  FileSystem.new,
-                  FileReader.new
+                  FileSystem.new
 
 subdl.main ARGV

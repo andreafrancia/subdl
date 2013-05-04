@@ -4,11 +4,42 @@ require 'json'
 require 'zipruby'
 require 'nokogiri'
 
+class ItasaAgent
+
+  def initialize
+    @agent = Mechanize.new do |a|
+      a.user_agent_alias = 'Mac FireFox'
+    end
+  end
+
+  def get url
+    @agent.get url
+  end
+
+  def login username, password
+    return if logged_in?
+    page_where_to_login = 'http://www.italiansubs.net'
+    home_page = @agent.get page_where_to_login
+    login_form = home_page.form 'login'
+    login_form.username = username
+    login_form.passwd = password
+    @page = @agent.submit(login_form)
+  end
+
+  private
+
+  def logged_in?
+    return false unless @page
+    link_that_exists_only_once_logged = @page.search(
+      "//a[@href='forum/index.php?action=unreadreplies']")
+    return link_that_exists_only_once_logged.first != nil
+  end
+end
+
 class Subdl
-  def initialize agent, itasa_login, stdout, file_system,
-                 file_reader
-    itasa = Itasa.new(agent, itasa_login)
-    credentials = Credentials.new file_reader
+  def initialize agent, stdout, file_system
+    itasa = Itasa.new agent
+    credentials = Credentials.new file_system
     @crawler = Crawler.new itasa, credentials, file_system, stdout
   end
   def main argv
@@ -32,7 +63,7 @@ class Crawler
     ids = @itasa.search_subtitles(movie_file.search_term)
 
     if not ids.any? 
-      @stdout.puts "No subtitles found on Itasa for: #{path}"
+      @stdout.puts "No subtitles found on ITASA for: #{path}"
     end
 
     ids.each do |id|
@@ -105,45 +136,18 @@ class FileSystem
       f.write contents
     end
   end
-end
-
-def mechanize_agent
-  Mechanize.new do |a|
-    a.user_agent_alias = 'Mac FireFox'
+  def read_expand expandable_path
+    File.read(File.expand_path(expandable_path))
   end
-end
-
-class ItasaLoginForm
-
-  def login username, password, page_where_to_login, agent
-    return if logged_in?
-    home_page = agent.get page_where_to_login
-    login_form = home_page.form 'login'
-    login_form.username = username
-    login_form.passwd = password
-    @page = agent.submit(login_form)
-  end
-
-  private
-
-  def logged_in?
-    return false unless @page
-    link_that_exists_only_once_logged = @page.search(
-      "//a[@href='forum/index.php?action=unreadreplies']")
-    return link_that_exists_only_once_logged.first != nil
-  end
-
-
 end
 
 class Itasa
-  def initialize agent, login_form
+  def initialize agent
     @agent = agent
-    @login_form = login_form || ItasaLoginForm.new
   end
 
   def login username, password
-    @login_form.login username, password, "http://#{host}", @agent
+    @agent.login username, password
   end
 
   def search_subtitles text
@@ -201,12 +205,7 @@ class Credentials
     [username, password]
   end
   def read
-    parse @file_reader.read_expand('~/.itasa-credentials')
+    @parsed ||= parse @file_reader.read_expand('~/.itasa-credentials')
   end
 end
 
-class FileReader
-  def read_expand expandable_path
-    File.read(File.expand_path(expandable_path))
-  end
-end
