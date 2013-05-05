@@ -1,14 +1,25 @@
 require 'mechanize'
 require 'nokogiri'
 
-class DetailsPage
-  def initialize html
-    @doc = Nokogiri::HTML(html)
+class SubtitlesNet
+  def initialize
+    @agent = Mechanize.new
   end
-
-  def zip_location
-    box = @doc.css('div.box')
-    box.css('a @href').first.value
+  def search text, season, episode
+    @agent.get 'http://www.sub-titles.net/' do |page|
+        form = page.form_with( :name => 'sf3') do |search|
+          search.sK = text
+          search.sTS = season
+          search.sTE = episode
+          search.field_with(name:'sJ').value=2
+          # 2 -> Inglese
+          # 9 -> Italiano
+        end
+        return form.submit.body
+    end
+  end
+  def get url
+    @agent.get(url).body
   end
 end
 
@@ -45,19 +56,13 @@ class SearchResults
   end
 end
 
-class PodnapisiClient
-  def search text, season, episode
-    agent = Mechanize.new
-    agent.get 'http://www.sub-titles.net/' do |page|
-        form = page.form_with( :name => 'sf3') do |search|
-          search.sK = text
-          search.sTS = season
-          search.sTE = episode
-          form.field_with(name:'sJ').value=2
-          # 2 -> Inglese
-          # 9 -> Italiano
-        end
-        return form.submit.body
-    end
+class DetailsPage
+  def initialize html
+    @doc = Nokogiri::HTML(html)
+  end
+  def zip_location
+    box = @doc.css('div.box')
+    box.css('a @href').first.value
   end
 end
+

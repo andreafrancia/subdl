@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
 require 'subdl'
 
-subdl = Subdl.new ItasaAgent.new,
+subdl = Subdl.new(ItasaAgent.new,
+                  SubtitlesNet.new,
                   $stdout,
-                  FileSystem.new
+                  FileSystem.new)
 
 subdl.main ARGV

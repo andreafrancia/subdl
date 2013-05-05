@@ -4,56 +4,20 @@ require 'json'
 require 'zipruby'
 require 'nokogiri'
 
-class ItasaAgent
-
-  def initialize
-    @agent = Mechanize.new do |a|
-      a.user_agent_alias = 'Mac FireFox'
-    end
-  end
-
-  def get url
-    @agent.get url
-  end
-
-  def login username, password
-    return if logged_in?
-    page_where_to_login = 'http://www.italiansubs.net'
-    home_page = @agent.get page_where_to_login
-    login_form = home_page.form 'login'
-    login_form.username = username
-    login_form.passwd = password
-    @page = @agent.submit(login_form)
-  end
-
-  private
-
-  def logged_in?
-    return false unless @page
-    link_that_exists_only_once_logged = @page.search(
-      "//a[@href='forum/index.php?action=unreadreplies']")
-    return link_that_exists_only_once_logged.first != nil
-  end
-end
+require 'subdl/subtitles_net'
+require 'subdl/italiansubs'
 
 class Subdl
-  def initialize agent, stdout, file_system
-    itasa = Itasa.new agent
-    credentials = Credentials.new file_system
-    @crawler = Crawler.new itasa, credentials, file_system, stdout
-  end
   def main argv
     until argv.empty? do
-      @crawler.download_sub_for argv.shift
+      download_sub_for argv.shift
     end
   end
-end
 
-class Crawler
-
-  def initialize itasa, credentials, file_system, stdout
-    @itasa = itasa
-    @credentials = credentials
+  def initialize itasa, subtitles_net, stdout, file_system
+    @itasa = Itasa.new itasa
+    @subtitles_net = subtitles_net
+    @credentials = Credentials.new file_system
     @file_system = file_system
     @stdout = stdout
   end
@@ -62,22 +26,35 @@ class Crawler
     movie_file = MovieFile.new path, @stdout
     ids = @itasa.search_subtitles(movie_file.search_term)
 
-    if not ids.any? 
-      @stdout.puts "No subtitles found on ITASA for: #{path}"
-    end
-
-    ids.each do |id|
-      @itasa.login *@credentials.read
-      @itasa.download_zip id do |zip_contents|
-        unpack_subtitle_to zip_contents, movie_file
+    if ids.any? 
+      ids.each do |id|
+        @itasa.login *@credentials.read
+        @itasa.download_zip id do |zip_contents|
+          unpack_subtitle_to zip_contents, movie_file, 'itasa'
+        end
       end
+    else
+      @stdout.puts "No subtitles found on ITASA for: #{path}"
+      show    = movie_file.show
+      season  = movie_file.season
+      episode = movie_file.episode
+      
+      search_results = SearchResults.new(
+        @subtitles_net.search show, season, episode)
+
+      details_page_link = search_results.subtitles.first.href
+      page = @subtitles_net.get details_page_link
+      details_page = DetailsPage.new page
+
+      zip_contents = @subtitles_net.get details_page.zip_location
+      unpack_subtitle_to zip_contents, movie_file, 'subtitles-net'
     end
   end
 
-  def unpack_subtitle_to zip_contents, movie_file
+  def unpack_subtitle_to zip_contents, movie_file, source_id
     Zip::Archive.open_buffer(zip_contents) do |archive|
       archive.each do |entry|
-        movie_file.save_subtitle entry.read, @file_system
+        movie_file.save_subtitle entry.read, @file_system, source_id
       end
     end
   end
@@ -112,9 +89,10 @@ class MovieFile
     "%s %dx%02d" % [show, season, episode]
   end
 
-  def save_subtitle contents, fs
+  # TODO: accept filename instead of source_id
+  def save_subtitle contents, fs, source_id
     srt_filename = @filename.gsub /.mp4$/, ''
-    srt_filename += ".itasa#{next_distinguisher}.srt"
+    srt_filename += ".#{source_id}#{next_distinguisher}.srt"
     @stdout.puts "Downloaded as #{srt_filename}"
     fs.save_file srt_filename, contents
   end

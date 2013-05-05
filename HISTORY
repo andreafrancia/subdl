@@ -1,2 +1,4 @@
+0.0.9 Fallback to english search on sub-titles.net when no subtitles are found 
+      on italiansubs.net
 0.0.8 Now subdl tells if no subtitles are found on italiansubs.net.
 0.0.7 Now subdl tells which subtitle file has been created.

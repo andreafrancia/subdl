@@ -1,13 +1,13 @@
 describe 'Subtile download' do
   subject { subdl }
-  let(:subdl) { Subdl.new itasa, stdout, file_system }
+  let(:subdl) { Subdl.new itasa, subtitles_net, stdout, file_system }
 
-  let(:itasa)       { double 'itasa' }
-  let(:stdout)      { StringIO.new }
-  let(:file_system) { double 'file_system' }
+  let(:itasa)         { double 'itasa' }
+  let(:stdout)        { StringIO.new }
+  let(:file_system)   { double 'file_system' }
+  let(:subtitles_net) { double 'subtitles.net' }
 
-  specify 'download from italian-subs.net' do
-
+  specify 'download from italiansubs.net' do
     expect_GET(
       'http://www.italiansubs.net/modules/mod_itasalivesearch/search.php?' +
       'term=Show+1x02',
@@ -24,8 +24,8 @@ describe 'Subtile download' do
       'http://www.italiansubs.net/index.php?option=com_remository&Itemid=6'+
       '&func=fileinfo&id=222',
       '<a href="zip_location2"><img src=".../download2.gif"></a>')
-    expect_GET('zip_location1', a_zip)
-    expect_GET('zip_location2', a_zip)
+    expect_GET('zip_location1', a_zip_with('subtitles.srt', 'contents'))
+    expect_GET('zip_location2', a_zip_with('subtitles.srt', 'contents'))
     file_system.should_receive(:save_file).with(
       "Show.S01E02.avi.itasa.srt", "contents")
     file_system.should_receive(:save_file).with(
@@ -44,13 +44,67 @@ describe 'Subtile download' do
         'null')
     end
 
-    it 'should warn the user' do
-
+    it 'should fallback to sub-titles.net' do
+      subtitles_net.should_receive(:search).with('Show', '1', '3').
+        and_return(search_results_html)
+      subtitles_net.should_receive(:get).with(
+        '/it/ppodnapisi/podnapis/i/2403370/hart-of-dixie-2011-subtitles').
+        and_return(subtitle_details_page)
+      subtitles_net.should_receive(:get).with(
+        '/it/ppodnapisi/download/i/2382735/k/path-to-zip').and_return(
+          a_zip_with('an_srt_file.srt', 'from subtitles.net'))
+      file_system.should_receive(:save_file).with(
+        "Show.S01E03.avi.subtitles-net.srt", "from subtitles.net")
+        
       subdl.main ["Show.S01E03.avi"]
 
       output_lines.should include(
         'No subtitles found on ITASA for: Show.S01E03.avi')
     end
+  end
+
+  def search_results_html
+      <<-HTML
+<table class="list">
+  <tr class="a">
+    <td>
+      <a href="/it/ppodnapisi/kategorija/jezik/2">
+        <img src="/images/simple/zastave/male/2.gif" title="Inglese" >
+      </a>
+      <a href="/it/ppodnapisi/podnapis/i/2403370/hart-of-dixie-2011-subtitles">
+        Hart of Dixie <b>(2011)</b></a>
+      <img src= "/images/simple/oznake/h.gif" class="slikevvrsti" title=
+      "Subtitle is for high-definition video">
+      <img src= "/images/simple/oznake/u.gif" class="slikevvrsti" title=
+      "Unicode encoded subtitle">&nbsp;<br>
+      <span class="opis">Serie: <b>2</b> Episodio: <b>21</b>,&nbsp;</span>
+    </td>
+    <td align="center">1215</td> <!-- Downloads -->
+    <td align="center">1</td>
+    <td align="center">23,976</td>
+    <td align="center">SubRip</td>
+    <td align="center">
+      <a href="/it/ppodnapisi/search/sA/226856" 
+        title="Show author subtitles by grzesiek11">grzesiek11</a>
+    </td>
+    <td align="center">01.05.2013</td>
+  </tr>
+</table>
+      HTML
+  end
+
+  def subtitle_details_page
+    <<-HTML
+    <div class="box" style="padding-top: 5px;">
+      <a href="/it/ppodnapisi/download/i/2382735/k/path-to-zip">
+        <img src="/images/simple/downloadS.gif" alt="" 
+             onmouseover="src='/images/simple/downloadT.gif'" 
+             onmouseout="src='/images/simple/downloadS.gif'" 
+             title="Download">&nbsp;
+        <h1>Download</h1>
+      </a>
+    </div>
+    HTML
   end
 
   def output_lines
@@ -68,10 +122,10 @@ describe 'Subtile download' do
     Struct.new(:body).new(content)
   end
 
-  def a_zip
+  def a_zip_with filename, contents
     buf = ''
     Zip::Archive.open_buffer(buf, Zip::CREATE) do |archive|
-      archive.add_buffer 'subtitle.srt', 'contents'
+      archive.add_buffer filename, contents
     end
     return buf
   end

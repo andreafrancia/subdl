@@ -1,30 +1,6 @@
 require 'subdl'
 
 describe MovieFile do
-  context 'saving subtitles' do
-    let(:fs) { double 'fs' }
-    let(:stdout) { StringIO.new }
-    
-    it 'should save to srt file' do
-      fs.should_receive(:save_file).with('ShowS04E03.itasa.srt', 'contents')
-
-      movie = MovieFile.new 'ShowS04E03.mp4', stdout
-
-      movie.save_subtitle 'contents', fs
-    end
-
-    it 'should save the second file with a different filename' do
-      fs.should_receive(:save_file).with('ShowS04E03.itasa.srt', 'first file')
-      fs.should_receive(:save_file).with('ShowS04E03.itasa.1.srt', 'second file')
-      fs.should_receive(:save_file).with('ShowS04E03.itasa.2.srt', 'third file')
-
-      movie = MovieFile.new 'ShowS04E03.mp4', stdout
-
-      movie.save_subtitle 'first file', fs
-      movie.save_subtitle 'second file', fs
-      movie.save_subtitle 'third file', fs
-    end
-  end
   context 'filename parsing' do
     context 'should filter out year' do
       subject { MovieFile.new('Showname.2012.S06E15').show }

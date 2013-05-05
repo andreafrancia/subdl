@@ -1,11 +1,10 @@
 TODO:
- - fallback to www.subs-title.net
+ - support lower case filenames, e.g. show.s10e02.avi
  - ask credentials to the user
  - preserve original filename from zip
  - does not download duplicates
  - drag and drop
- - support movies
- - should issue a warning when the file does not exists
- - when a folder is specified
+ - support movies other than tv shows
+ - issue a warning when the movie file does not exists
+ - issue a warning when a folder is specified
  - tell from which page the subtitle has been downloaded
- - should accept all lower case filenames, e.g. show.s10e02.avi
