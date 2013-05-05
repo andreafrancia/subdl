@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'subdl'
-  s.version     = '0.0.8'
+  s.version     = '0.0.9'
   s.date        = '2013-03-14'
   s.summary     = "Download subtitles for your favorite show."
   s.description = "A simple hello world gem"
