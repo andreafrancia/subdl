@@ -1,5 +1,6 @@
 TODO:
  - support lower case filenames, e.g. show.s10e02.avi
+ - support filename like this: the.wonderful.show.417.hdtv-lol.mp4
  - ask credentials to the user
  - preserve original filename from zip
  - does not download duplicates

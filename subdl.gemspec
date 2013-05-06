@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description = "A simple hello world gem"
   s.authors     = ["Andrea Francia"]
   s.email       = 'andrea@andreafrancia.it'
-  s.files       = ["lib/subdl.rb"]
+  s.files       = Dir.glob("{bin,lib}/**/*") & `git ls-files -z`.split("\0")
   s.homepage    = 'https://github.com/andreafrancia/subdl'
   s.executables << 'subdl'
   s.add_runtime_dependency 'mechanize'
